@@ -46,6 +46,16 @@ React.Component = visualizeRender()(React.Component);
 React.PureComponent = visualizeRender()(React.PureComponent);
 ```
 
+You can specify a list of names to ignore (e.g. to ignore react-redux's Connect):
+
+```js
+import React from 'react';
+import { visualizeRender } from 'react-global-render-visualizer';
+
+React.Component = visualizeRender({ ignoreNames: ['Connect'] })(React.Component);
+React.PureComponent = visualizeRender({ ignoreNames: ['Connect'] })(React.PureComponent);
+```
+
 Demo
 ----
 

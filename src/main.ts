@@ -11,13 +11,15 @@ export interface RenderVisualizerOptions {
   logInstance: boolean;
   ReactDOM: {
     findDOMNode(instance: any): HTMLElement
-  }
+  },
+  ignoreNames: string[];
 }
 
 export class RenderVisualizer {
   options: RenderVisualizerOptions;
 
   instance: any;
+  name: string;
   originalComponentDidMount: Function;
   originalComponentDidUpdate: Function;
   originalComponentWillUnmount: Function;
@@ -69,12 +71,16 @@ export class RenderVisualizer {
 
   constructor(instance: any, options: RenderVisualizerOptions) {
     this.options = options;
+    this.instance = instance;
+    this.name = this.instance.constructor ? this.instance.constructor.name : null;
+
+    if (options.ignoreNames.indexOf(this.name) !== -1) {
+      return;
+    }
 
     if (options.logInstance) {
       console.log(instance);
     }
-
-    this.instance = instance;
 
     this.originalComponentDidMount = instance.componentDidMount;
     this.originalComponentDidUpdate = instance.componentDidUpdate;
@@ -173,7 +179,7 @@ export class RenderVisualizer {
     let renderLogDetailContainer = document.createElement('div');
 
     this.renderLogContainer.className = 'renderLog';
-    this.renderLogContainer.title = this.instance.constructor.name;
+    this.renderLogContainer.title = this.name;
 
     // Apply styling
     this.applyCSSStyling(this.renderLogContainer, this.styling.renderLog)
@@ -392,6 +398,9 @@ export function visualizeRender(options?: RenderVisualizerOptions) {
   }
   if (options.ReactDOM == null) {
     options.ReactDOM = require('react-dom');
+  }
+  if (options.ignoreNames == null) {
+    options.ignoreNames = [];
   }
 
   return function<T extends React.ComponentClass<any>>(component: T): T {
