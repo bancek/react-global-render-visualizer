@@ -2,6 +2,10 @@
   "name": "react-global-render-visualizer",
   "version": "0.1.0",
   "description": "Render visualizer for React",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/bancek/react-global-render-visualizer.git"
+  },
   "main": "./lib/main.js",
   "scripts": {
     "prepublish": "tsc",
@@ -22,8 +26,8 @@
     "@types/react": "^0.14.52",
     "typescript": "^2.0.10"
   },
-  "dependencies": {
-    "react": "^15.4.1",
-    "react-dom": "^15.4.1"
+  "peerDependencies": {
+    "react": ">=0.14.0",
+    "react-dom": ">=0.14.0"
   }
 }
