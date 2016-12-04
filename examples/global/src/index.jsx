@@ -2,8 +2,8 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { visualizeRender } from 'react-global-render-visualizer';
 
-React.Component = visualizeRender()(React.Component);
-React.PureComponent = visualizeRender()(React.PureComponent);
+React.Component = visualizeRender({ ignoreNames: ['Connect'] })(React.Component);
+React.PureComponent = visualizeRender({ ignoreNames: ['Connect'] })(React.PureComponent);
 
 class Example extends React.Component {
   constructor(props) {
@@ -28,6 +28,11 @@ class Example extends React.Component {
         <p>Counter: {counter}</p>
         <Child foo={42} />
         <PureChild foo={42} />
+        <Connect><PureChild foo={42} /></Connect>
+        <div style={{position: 'relative'}}>
+          <div style={{position: 'absolute', left: '0px', top: '0px'}}><Child foo={100} /></div>
+          <div style={{position: 'absolute', left: '0px', top: '0px'}}><PureChild foo={1001} /></div>
+        </div>
       </div>
     )
   }
@@ -50,6 +55,12 @@ class PureChild extends React.PureComponent {
     return (
       <div style={{ padding: '15px' }}>PureChild {foo}</div>
     )
+  }
+}
+
+class Connect extends React.Component {
+  render() {
+    return React.Children.only(this.props.children);
   }
 }
 

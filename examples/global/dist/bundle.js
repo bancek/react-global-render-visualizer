@@ -66,8 +66,8 @@
 
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-	_react2.default.Component = (0, _reactGlobalRenderVisualizer.visualizeRender)()(_react2.default.Component);
-	_react2.default.PureComponent = (0, _reactGlobalRenderVisualizer.visualizeRender)()(_react2.default.PureComponent);
+	_react2.default.Component = (0, _reactGlobalRenderVisualizer.visualizeRender)({ ignoreNames: ['Connect'] })(_react2.default.Component);
+	_react2.default.PureComponent = (0, _reactGlobalRenderVisualizer.visualizeRender)({ ignoreNames: ['Connect'] })(_react2.default.PureComponent);
 
 	var Example = function (_React$Component) {
 	  _inherits(Example, _React$Component);
@@ -106,7 +106,26 @@
 	          counter
 	        ),
 	        _react2.default.createElement(Child, { foo: 42 }),
-	        _react2.default.createElement(PureChild, { foo: 42 })
+	        _react2.default.createElement(PureChild, { foo: 42 }),
+	        _react2.default.createElement(
+	          Connect,
+	          null,
+	          _react2.default.createElement(PureChild, { foo: 42 })
+	        ),
+	        _react2.default.createElement(
+	          'div',
+	          { style: { position: 'relative' } },
+	          _react2.default.createElement(
+	            'div',
+	            { style: { position: 'absolute', left: '0px', top: '0px' } },
+	            _react2.default.createElement(Child, { foo: 100 })
+	          ),
+	          _react2.default.createElement(
+	            'div',
+	            { style: { position: 'absolute', left: '0px', top: '0px' } },
+	            _react2.default.createElement(PureChild, { foo: 1001 })
+	          )
+	        )
 	      );
 	    }
 	  }]);
@@ -167,6 +186,25 @@
 
 	  return PureChild;
 	}(_react2.default.PureComponent);
+
+	var Connect = function (_React$Component3) {
+	  _inherits(Connect, _React$Component3);
+
+	  function Connect() {
+	    _classCallCheck(this, Connect);
+
+	    return _possibleConstructorReturn(this, (Connect.__proto__ || Object.getPrototypeOf(Connect)).apply(this, arguments));
+	  }
+
+	  _createClass(Connect, [{
+	    key: 'render',
+	    value: function render() {
+	      return _react2.default.Children.only(this.props.children);
+	    }
+	  }]);
+
+	  return Connect;
+	}(_react2.default.Component);
 
 	_reactDom2.default.render(_react2.default.createElement(Example, null), document.getElementById('container'));
 
@@ -21620,13 +21658,20 @@
 	            },
 	            elementHighlightUpdate: {
 	                outline: '3px solid rgba(197, 203, 1, 1)'
+	            },
+	            elementHighlightHover: {
+	                outline: '3px solid rgba(255, 0, 255, 1)'
 	            }
 	        };
 	        this.options = options;
+	        this.instance = instance;
+	        this.name = this.instance.constructor ? this.instance.constructor.name : null;
+	        if (options.ignoreNames.indexOf(this.name) !== -1) {
+	            return;
+	        }
 	        if (options.logInstance) {
 	            console.log(instance);
 	        }
-	        this.instance = instance;
 	        this.originalComponentDidMount = instance.componentDidMount;
 	        this.originalComponentDidUpdate = instance.componentDidUpdate;
 	        this.originalComponentWillUnmount = instance.componentWillUnmount;
@@ -21702,6 +21747,7 @@
 	        this.renderLogRenderCount = document.createElement('div');
 	        var renderLogDetailContainer = document.createElement('div');
 	        this.renderLogContainer.className = 'renderLog';
+	        this.renderLogContainer.title = this.name;
 	        // Apply styling
 	        this.applyCSSStyling(this.renderLogContainer, this.styling.renderLog);
 	        // Attach the click handler for toggling the detail log
@@ -21715,6 +21761,18 @@
 	                _this.renderLogRenderCount.style.display = 'none';
 	                renderLogDetailContainer.style.display = 'block';
 	                _this.renderLogContainer.style.zIndex = '10001';
+	            }
+	        });
+	        this.renderLogContainer.addEventListener('mouseover', function () {
+	            var parentNode = _this.options.ReactDOM.findDOMNode(_this.instance);
+	            if (parentNode) {
+	                parentNode.style.outline = _this.styling.elementHighlightHover.outline;
+	            }
+	        });
+	        this.renderLogContainer.addEventListener('mouseout', function () {
+	            var parentNode = _this.options.ReactDOM.findDOMNode(_this.instance);
+	            if (parentNode) {
+	                parentNode.style.outline = _this.styling.elementHighlightMonitor.outline;
 	            }
 	        });
 	        this.renderLogRenderCount.className = 'renderLogCounter';
@@ -21744,8 +21802,22 @@
 	        var parentNode = this.options.ReactDOM.findDOMNode(this.instance),
 	            parentNodeRect = parentNode && parentNode.getBoundingClientRect();
 	        if (this.renderLogContainer && parentNodeRect) {
-	            this.renderLogContainer.style.top = window.pageYOffset + parentNodeRect.top + 'px';
-	            this.renderLogContainer.style.left = parentNodeRect.left + 'px';
+	            var left = parentNodeRect.left;
+	            var top_1 = window.pageYOffset + parentNodeRect.top;
+	            while (true) {
+	                var el = document.elementFromPoint(left + 1, top_1 + 1);
+	                if (el && (el.className === 'renderLog' && el != this.renderLogContainer || el.className === 'renderLogCounter' && el != this.renderLogRenderCount)) {
+	                    if (el.className === 'renderLog') {
+	                        left += el.clientWidth + 2;
+	                    } else if (el.className === 'renderLogCounter') {
+	                        left += el.parentElement.clientWidth + 2;
+	                    }
+	                } else {
+	                    break;
+	                }
+	            }
+	            this.renderLogContainer.style.left = left + 'px';
+	            this.renderLogContainer.style.top = top_1 + 'px';
 	        }
 	    };
 	    /*
@@ -21858,6 +21930,9 @@
 	    }
 	    if (options.ReactDOM == null) {
 	        options.ReactDOM = __webpack_require__(179);
+	    }
+	    if (options.ignoreNames == null) {
+	        options.ignoreNames = [];
 	    }
 	    return function (component) {
 	        var visualizer = RenderVisualizer;

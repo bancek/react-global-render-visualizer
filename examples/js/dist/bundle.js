@@ -21623,13 +21623,20 @@
 	            },
 	            elementHighlightUpdate: {
 	                outline: '3px solid rgba(197, 203, 1, 1)'
+	            },
+	            elementHighlightHover: {
+	                outline: '3px solid rgba(255, 0, 255, 1)'
 	            }
 	        };
 	        this.options = options;
+	        this.instance = instance;
+	        this.name = this.instance.constructor ? this.instance.constructor.name : null;
+	        if (options.ignoreNames.indexOf(this.name) !== -1) {
+	            return;
+	        }
 	        if (options.logInstance) {
 	            console.log(instance);
 	        }
-	        this.instance = instance;
 	        this.originalComponentDidMount = instance.componentDidMount;
 	        this.originalComponentDidUpdate = instance.componentDidUpdate;
 	        this.originalComponentWillUnmount = instance.componentWillUnmount;
@@ -21705,6 +21712,7 @@
 	        this.renderLogRenderCount = document.createElement('div');
 	        var renderLogDetailContainer = document.createElement('div');
 	        this.renderLogContainer.className = 'renderLog';
+	        this.renderLogContainer.title = this.name;
 	        // Apply styling
 	        this.applyCSSStyling(this.renderLogContainer, this.styling.renderLog);
 	        // Attach the click handler for toggling the detail log
@@ -21718,6 +21726,18 @@
 	                _this.renderLogRenderCount.style.display = 'none';
 	                renderLogDetailContainer.style.display = 'block';
 	                _this.renderLogContainer.style.zIndex = '10001';
+	            }
+	        });
+	        this.renderLogContainer.addEventListener('mouseover', function () {
+	            var parentNode = _this.options.ReactDOM.findDOMNode(_this.instance);
+	            if (parentNode) {
+	                parentNode.style.outline = _this.styling.elementHighlightHover.outline;
+	            }
+	        });
+	        this.renderLogContainer.addEventListener('mouseout', function () {
+	            var parentNode = _this.options.ReactDOM.findDOMNode(_this.instance);
+	            if (parentNode) {
+	                parentNode.style.outline = _this.styling.elementHighlightMonitor.outline;
 	            }
 	        });
 	        this.renderLogRenderCount.className = 'renderLogCounter';
@@ -21747,8 +21767,22 @@
 	        var parentNode = this.options.ReactDOM.findDOMNode(this.instance),
 	            parentNodeRect = parentNode && parentNode.getBoundingClientRect();
 	        if (this.renderLogContainer && parentNodeRect) {
-	            this.renderLogContainer.style.top = window.pageYOffset + parentNodeRect.top + 'px';
-	            this.renderLogContainer.style.left = parentNodeRect.left + 'px';
+	            var left = parentNodeRect.left;
+	            var top_1 = window.pageYOffset + parentNodeRect.top;
+	            while (true) {
+	                var el = document.elementFromPoint(left + 1, top_1 + 1);
+	                if (el && (el.className === 'renderLog' && el != this.renderLogContainer || el.className === 'renderLogCounter' && el != this.renderLogRenderCount)) {
+	                    if (el.className === 'renderLog') {
+	                        left += el.clientWidth + 2;
+	                    } else if (el.className === 'renderLogCounter') {
+	                        left += el.parentElement.clientWidth + 2;
+	                    }
+	                } else {
+	                    break;
+	                }
+	            }
+	            this.renderLogContainer.style.left = left + 'px';
+	            this.renderLogContainer.style.top = top_1 + 'px';
 	        }
 	    };
 	    /*
@@ -21861,6 +21895,9 @@
 	    }
 	    if (options.ReactDOM == null) {
 	        options.ReactDOM = __webpack_require__(179);
+	    }
+	    if (options.ignoreNames == null) {
+	        options.ignoreNames = [];
 	    }
 	    return function (component) {
 	        var visualizer = RenderVisualizer;

@@ -9,10 +9,12 @@ export interface RenderVisualizerOptions {
     ReactDOM: {
         findDOMNode(instance: any): HTMLElement;
     };
+    ignoreNames: string[];
 }
 export declare class RenderVisualizer {
     options: RenderVisualizerOptions;
     instance: any;
+    name: string;
     originalComponentDidMount: Function;
     originalComponentDidUpdate: Function;
     originalComponentWillUnmount: Function;
@@ -51,6 +53,9 @@ export declare class RenderVisualizer {
             outline: string;
         };
         elementHighlightUpdate: {
+            outline: string;
+        };
+        elementHighlightHover: {
             outline: string;
         };
     };
