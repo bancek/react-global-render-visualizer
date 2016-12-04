@@ -62,6 +62,9 @@ export class RenderVisualizer {
     elementHighlightUpdate: {
       outline: '3px solid rgba(197, 203, 1, 1)',
     },
+    elementHighlightHover: {
+      outline: '3px solid rgba(255, 0, 255, 1)',
+    },
   };
 
   constructor(instance: any, options: RenderVisualizerOptions) {
@@ -187,6 +190,20 @@ export class RenderVisualizer {
         this.renderLogRenderCount.style.display = 'none';
         renderLogDetailContainer.style.display = 'block';
         this.renderLogContainer.style.zIndex = '10001';
+      }
+    });
+    this.renderLogContainer.addEventListener('mouseover', () => {
+      var parentNode = this.options.ReactDOM.findDOMNode(this.instance) as HTMLElement;
+
+      if (parentNode) {
+        parentNode.style.outline = this.styling.elementHighlightHover.outline;
+      }
+    });
+    this.renderLogContainer.addEventListener('mouseout', () => {
+      var parentNode = this.options.ReactDOM.findDOMNode(this.instance) as HTMLElement;
+
+      if (parentNode) {
+        parentNode.style.outline = this.styling.elementHighlightMonitor.outline;
       }
     });
 
