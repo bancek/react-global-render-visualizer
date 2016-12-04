@@ -2,6 +2,8 @@
 
 Render visualizer for React. A visual way to see what is (re)rendering and why.
 
+![Example](example.png)
+
 Typescript version with support for global React.Component patching ported from
 <https://github.com/marcin-mazurek/react-render-visualizer-decorator>.
 
