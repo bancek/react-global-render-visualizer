@@ -170,6 +170,7 @@ export class RenderVisualizer {
     let renderLogDetailContainer = document.createElement('div');
 
     this.renderLogContainer.className = 'renderLog';
+    this.renderLogContainer.title = this.instance.constructor.name;
 
     // Apply styling
     this.applyCSSStyling(this.renderLogContainer, this.styling.renderLog)
