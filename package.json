@@ -9,7 +9,8 @@
   "main": "./lib/main.js",
   "scripts": {
     "prepublish": "tsc",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "buildexamples": "cd examples/global && webpack && cd ../js && webpack && cd ../ts && webpack"
   },
   "keywords": [
     "react",
