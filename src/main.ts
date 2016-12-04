@@ -244,8 +244,25 @@ export class RenderVisualizer {
       parentNodeRect = parentNode && parentNode.getBoundingClientRect();
 
     if (this.renderLogContainer && parentNodeRect) {
-      this.renderLogContainer.style.top = (window.pageYOffset + parentNodeRect.top) + 'px';
-      this.renderLogContainer.style.left = (parentNodeRect.left) + 'px';
+      let left = parentNodeRect.left;
+      let top = (window.pageYOffset + parentNodeRect.top);
+
+      while (true) {
+        let el = document.elementFromPoint(left + 1, top + 1);
+
+        if (el && ((el.className === 'renderLog' && el != this.renderLogContainer) || (el.className === 'renderLogCounter' && el != this.renderLogRenderCount))) {
+          if (el.className === 'renderLog') {
+            left += el.clientWidth + 2;
+          } else if (el.className === 'renderLogCounter') {
+            left += el.parentElement.clientWidth + 2;
+          }
+        } else {
+          break;
+        }
+      }
+
+      this.renderLogContainer.style.left = left + 'px';
+      this.renderLogContainer.style.top = top + 'px';
     }
   }
 
